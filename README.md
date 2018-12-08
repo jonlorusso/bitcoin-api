@@ -14,7 +14,7 @@ The project also makes use of the [Spotify Dockerfile Plugin](https://github.com
 ### Build
 
 ```
-./mvnw package
+./mvnw clean package
 ```
 
 
