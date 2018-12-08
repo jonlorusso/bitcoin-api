@@ -1,9 +1,9 @@
 package com.jonlorusso.bitcoinapi;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -23,29 +22,37 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @SpringBootApplication
 public class BitcoinApiApplication {
 
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
     @RestController
     public static class Controller {
 
-        private Stream<TransactionOutput> getOutputs(String address, Transaction transaction) {
+        @Autowired
+        private RestTemplate restTemplate;
+
+        private Stream<TransactionOutput> outputs(Transaction transaction) {
+            String address = transaction.getSubjectAddress();
+            String hash = transaction.getHash();
+
             return transaction.getOut().stream()
                     .filter(o -> !isEmpty(o.getAddr()))
                     .filter(o -> o.getAddr().equals(address))
                     .filter(o -> !o.isSpent())
-                    .map(o -> { o.setTxHash(transaction.getHash()); return o; });
+                    .peek(o -> o.setTxHash(hash));
         }
 
         private Stream<Transaction> transactions(String address) {
             Stream<Transaction> transactions = Stream.empty();
-
-            RestTemplate restTemplate = new RestTemplate();
 
             int offset = 0;
             String addressUrl = format("https://blockchain.info/rawaddr/%s?offset=%d", address, offset);
             AddressInfo addressInfo = restTemplate.getForObject(addressUrl, AddressInfo.class);
 
             while (addressInfo.getTransactions().size() > 0) {
-                transactions = Stream.concat(transactions, addressInfo.getTransactions().stream());
+                transactions = Stream.concat(transactions, addressInfo.getTransactions().stream().peek(t -> t.setSubjectAddress(address)));
 
                 offset += addressInfo.getTransactions().size();
                 addressUrl = format("https://blockchain.info/rawaddr/%s?offset=%d", address, offset);
@@ -58,7 +65,7 @@ public class BitcoinApiApplication {
         @RequestMapping(value = "/address/{address}", method = GET)
         public Map<String, List<TransactionOutput>> unspentTransactions(@PathVariable String address) {
             Map<String, List<TransactionOutput>> response = new HashMap<>();
-            response.put("outputs", transactions(address).flatMap(t -> getOutputs(address, t)).collect(toList()));
+            response.put("outputs", transactions(address).flatMap(this::outputs).collect(toList()));
             return response;
         }
     }

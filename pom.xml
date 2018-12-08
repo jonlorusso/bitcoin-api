@@ -38,7 +38,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>RELEASE</version>
+            <version>2.1.1.RELEASE</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -69,6 +69,7 @@
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
+                    <noCache>true</noCache>
                 </configuration>
             </plugin>
             <plugin>

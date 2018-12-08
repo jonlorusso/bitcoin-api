@@ -11,6 +11,18 @@ public class TransactionOutput {
     private long value;
     private int n;
 
+    public TransactionOutput() {
+        super();
+    }
+
+    public TransactionOutput(String txHash, boolean spent, String addr, long value, int n) {
+        this.txHash = txHash;
+        this.spent = spent;
+        this.addr = addr;
+        this.value = value;
+        this.n = n;
+    }
+
     public String getTxHash() {
         return txHash;
     }
