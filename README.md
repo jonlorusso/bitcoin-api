@@ -12,7 +12,6 @@ The project also makes use of the [Spotify Dockerfile Plugin](https://github.com
 
 ### Run
 
-Install the dependencies and devDependencies and start the server.
 
 ```
 docker run -it --rm -p 127.0.0.1:8080:8080/tcp com.jonlorusso/bitcoin-api:1.0.0
