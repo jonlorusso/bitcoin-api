@@ -16,6 +16,9 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+import static java.util.stream.Stream.empty;
+import static org.springframework.boot.SpringApplication.run;
 import static org.springframework.util.StringUtils.isEmpty;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -45,14 +48,14 @@ public class BitcoinApiApplication {
         }
 
         private Stream<Transaction> transactions(String address) {
-            Stream<Transaction> transactions = Stream.empty();
+            Stream<Transaction> transactions = empty();
 
             int offset = 0;
             String addressUrl = format("https://blockchain.info/rawaddr/%s?offset=%d", address, offset);
             AddressInfo addressInfo = restTemplate.getForObject(addressUrl, AddressInfo.class);
 
             while (addressInfo.getTransactions().size() > 0) {
-                transactions = Stream.concat(transactions, addressInfo.getTransactions().stream().peek(t -> t.setSubjectAddress(address)));
+                transactions = concat(transactions, addressInfo.getTransactions().stream().peek(t -> t.setSubjectAddress(address)));
 
                 offset += addressInfo.getTransactions().size();
                 addressUrl = format("https://blockchain.info/rawaddr/%s?offset=%d", address, offset);
@@ -71,6 +74,6 @@ public class BitcoinApiApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(BitcoinApiApplication.class, args);
+        run(BitcoinApiApplication.class, args);
     }
 }
