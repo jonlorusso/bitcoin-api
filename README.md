@@ -25,4 +25,7 @@ The project also makes use of the [Spotify Dockerfile Plugin](https://github.com
 docker run -it --rm -p 127.0.0.1:8080:8080/tcp com.jonlorusso/bitcoin-api:1.0.0
 curl http://localhost:8080/address/3FjVHH5CuERomLc469aXMB1TJEEoRnbzqQ
 ```
-
+&nbsp;
+&nbsp;
+         
+[![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com)
