@@ -36,7 +36,7 @@ public class BitcoinApiApplication {
         @Autowired
         private RestTemplate restTemplate;
 
-        private Stream<TransactionOutput> outputs(Transaction transaction) {
+        private Stream<TransactionOutput> unspentOutputs(Transaction transaction) {
             String address = transaction.getSubjectAddress();
             String hash = transaction.getHash();
 
@@ -68,7 +68,7 @@ public class BitcoinApiApplication {
         @RequestMapping(value = "/address/{address}", method = GET)
         public Map<String, List<TransactionOutput>> unspentTransactions(@PathVariable String address) {
             Map<String, List<TransactionOutput>> response = new HashMap<>();
-            response.put("outputs", transactions(address).flatMap(this::outputs).collect(toList()));
+            response.put("outputs", transactions(address).flatMap(this::unspentOutputs).collect(toList()));
             return response;
         }
     }
